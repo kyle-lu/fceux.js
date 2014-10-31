@@ -244,7 +244,7 @@ InitVideo(FCEUGI *gi)
 	}
 
 	// gives the SDL exclusive palette control... ensures the requested colors
-	flags |= SDL_HWPALETTE;
+	// flags |= SDL_HWPALETTE;
 
 	// enable double buffering if requested and we have hardware support
 #ifdef OPENGL

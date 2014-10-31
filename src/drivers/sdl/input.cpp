@@ -435,7 +435,7 @@ void FCEUD_LoadStateFrom ()
 unsigned int *GetKeyboardAutorepeated(void)                                                     
 {
 	int size = 256;
-#if SDL_VERSION_ATLEAST(2, 0, 0)
+#if SDL_VERSION_ATLEAST(2, 0, 0) || defined(__EMSCRIPTEN__)
 	Uint8* keystate = (Uint8*)SDL_GetKeyboardState(&size);
 #else
 	Uint8* keystate = SDL_GetKeyState(&size);

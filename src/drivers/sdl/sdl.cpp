@@ -1,3 +1,4 @@
+#include <emscripten/emscripten.h>
 #include "main.h"
 #include "throttle.h"
 #include "config.h"
@@ -403,12 +404,12 @@ FCEUD_Update(uint8 *XBuf,
 		#endif
 		  WriteSound(Buffer,can);
 
+			if(XBuf && (inited&4) && !(NoWaiting & 2))
+				BlitScreen(XBuf);
 		//if(uflow) puts("Underflow");
 		tmpcan = GetWriteSound();
 		// don't underflow when scaling fps
 		if(g_fpsScale>1.0 || ((tmpcan < Count*0.90) && !uflow)) {
-			if(XBuf && (inited&4) && !(NoWaiting & 2))
-				BlitScreen(XBuf);
 			Buffer+=can;
 			Count-=can;
 			if(Count) {
@@ -523,7 +524,25 @@ void FCEUD_TraceInstruction() {
 	int noGui = 1;
 #endif
 
+int g_frameskip, g_periodic_saves;
+/**
+ * The main entry for Emscripten.
+ */
+static void emscripten_mainloop(void)
+{
+	if(GameInfo)
+	{
+		DoFun(g_frameskip, g_periodic_saves);
+	}
+	else
+	{
+		CloseGame();
 
+		// exit the infrastructure
+		FCEUI_Kill();
+		SDL_Quit();
+	}
+}
 /**
  * The main loop for the SDL.
  */
@@ -891,6 +910,7 @@ int main(int argc, char *argv[])
     } else {
         periodic_saves = 0;
     }
+	g_periodic_saves = periodic_saves;
 	
 #ifdef _S9XLUA_H
 	// load lua script if option passed
@@ -910,6 +930,7 @@ int main(int argc, char *argv[])
 	}
 
 	g_config->getOption("SDL.Frameskip", &frameskip);
+	g_frameskip = frameskip;
 	// loop playing the game
 #ifdef _GTK
 	if(noGui == 0)
@@ -929,17 +950,22 @@ int main(int argc, char *argv[])
 		while(GameInfo)
 			DoFun(frameskip, periodic_saves);
 	}
+#elif defined(__EMSCRIPTEN__)
+	emscripten_set_main_loop(emscripten_mainloop, 0, 1);
 #else
 	while(GameInfo)
 	{
 		DoFun(frameskip, periodic_saves);
 	}
 #endif
+	
+#ifndef __EMSCRIPTEN__
 	CloseGame();
 
 	// exit the infrastructure
 	FCEUI_Kill();
 	SDL_Quit();
+#endif
 	return 0;
 }
 

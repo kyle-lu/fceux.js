@@ -2,6 +2,7 @@
 #define _aosdfjk02fmasf
 
 #include "../common/configSys.h"
+#include "../../input.h"
 
 #define MAXBUTTCONFIG   4
 typedef struct {

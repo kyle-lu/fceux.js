@@ -173,10 +173,14 @@ WriteSound(int32 *buf,
 	if (EmulationPaused == 0)
 		while(Count)
 		{
-			while(s_BufferIn == s_BufferSize) 
+#ifdef __EMSCRIPTEN__
+			if(s_BufferIn == s_BufferSize) return;
+#else
+			while(s_BufferIn == s_BufferSize)
 			{
 				SDL_Delay(1);
 			}
+#endif
 
 			s_Buffer[s_BufferWrite] = *buf;
 			Count--;

@@ -1416,7 +1416,7 @@ void FCEUMOV_IncrementRerecordCount()
 		else
 			currMovieData.rerecordCount++;
 #else
-	if (movieMode != MOVIEMODE_TASEDITOR)currRerecordCount++;
+	if (movieMode != MOVIEMODE_TASEDITOR)
 		currRerecordCount++;
 	else
 		currMovieData.rerecordCount++;
